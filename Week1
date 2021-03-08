@@ -63,7 +63,7 @@ What was done : => Setting up the remote server VM
 6) Task : Mount /var/log on a separate mount point
 
 What was done : a) Configured OS for SIngle user Mode -> To avoid issues from occuring during mounting the system files
-                b) Command used : sed-i 's/^id:3:/id:1:/g' /etc/inittab
+                b) Command used : sed -i 's/^id:3:/id:1:/g' /etc/inittab
                 c) Added a new disk to the VM and shutdown the VM
                 d) Created a new partition : fdisk /dev/sdb
                 e) Created a volume group and logical volume : 'vgcreate vg_log /dev/sdb1'
@@ -74,4 +74,12 @@ What was done : a) Configured OS for SIngle user Mode -> To avoid issues from oc
                                                        'mount -t ext4 /dev/vg_log/lv_log /mnt/tmp_vol/
                                                        
                 h) Moved the existing var/log to the new location : 'mv /var/log* /mnt/tmp_vol'                                       
-                   
+
+
+7) Task : Automate the tasks with packer
+
+What was done : a) .json file was written to configure the VM seetings and memory and the cpu along with the ssh username and other parametrs for booting up
+                b) The scripts were written to add users and groups.
+                
+Problem : The SSH timeout is causing the termination of the installation of the OS. The VM gets automatically deleted (20.04 version).
+          Tried the same with 18.04 , this time it created the VM installed the OS succesfully but did not run the scripts that weer included in the folder.
