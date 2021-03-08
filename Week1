@@ -47,18 +47,31 @@ What was done : a) Installed Nginx server - Command used : 'apt-get install ngin
 5) Task : The users in the group interns should be able to login via a private key, and not a password
 
 What was done : => Setting up the remote server VM
-                   a) Form a user : 'adduser user1' 
-                   b) Switch to user1 : 'su user1'
-                   c) Note down the IP of the server VM : 'ifconfig'
+                   a) Formed a user : 'adduser user1' 
+                   b) Switched to user1 : 'su user1'
+                   c) Noted down the IP of the server VM : 'ifconfig'
                    
                 => Setting up the local machine VM
-                   a) Form a user : 'adduser user1' 
-                   b) Switch to user1 : 'su user1'
+                   a) Formed a user : 'adduser user1' 
+                   b) Switched to user1 : 'su user1'
                    c) Generated the keys : 'ssh-keygen'  -> here did not enter the passphrase in the prompt, since the user should be able to login without password
-                   d) Navigate to the /.ssh directory : 'cd .ssh' -> This directory consists of id_rsa and id_rsa.pub which are private and public keys respectively
+                   d) Navigated to the /.ssh directory : 'cd .ssh' -> This directory consists of id_rsa and id_rsa.pub which are private and public keys respectively
                    e) The public key has to be sent to the server VM : 'ssh-copy-id -i id_rsa.pub user1@IP_ADDRESS_SERVER' -> This copies the public key to the server
                    
                    Now the user can login directly : 'ssh user1@IPADDRESS_SERVER'  -> IPADDRESS_SERVER : ip address of the server
 
-6) Task : 
+6) Task : Mount /var/log on a separate mount point
+
+What was done : a) Configured OS for SIngle user Mode -> To avoid issues from occuring during mounting the system files
+                b) Command used : sed-i 's/^id:3:/id:1:/g' /etc/inittab
+                c) Added a new disk to the VM and shutdown the VM
+                d) Created a new partition : fdisk /dev/sdb
+                e) Created a volume group and logical volume : 'vgcreate vg_log /dev/sdb1'
+                                                              'lvcreate -l 100%VG -n lvlog vglog'
+                                                              
+                f) Mounted a file system to it : 'mkfs -t ext4 /dev/vg_log/lv_log'
+                g) Mounted it to a temporary directory : 'mkdir /mnt/temp/vol'
+                                                       'mount -t ext4 /dev/vg_log/lv_log /mnt/tmp_vol/
+                                                       
+                h) Moved the existing var/log to the new location : 'mv /var/log* /mnt/tmp_vol'                                       
                    
