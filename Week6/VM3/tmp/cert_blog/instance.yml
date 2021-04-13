@@ -1,0 +1,11 @@
+instances:
+  - name: 'node1'
+    dns: [ 'node1.elastic.test.com' ]
+  - name: "node2"
+    dns: [ 'node2.elastic.test.com' ]
+  - name: "node3"
+    dns: [ 'node3.elastic.test.com' ]
+  - name: 'my-kibana'
+    dns: [ 'kibana.local' ]
+  - name: 'logstash'
+    dns: [ 'logstash.local' ]

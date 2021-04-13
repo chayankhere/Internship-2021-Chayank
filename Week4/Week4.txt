@@ -1,0 +1,175 @@
+Week 4
+
+Task 1: On a standalone VM, install MariaDB 10.5.6 and create a user same as your laptop login user then, create database Nginx and restore the SQL file attached in the mail.
+
+What was done:
+STEP 1: Ensure your system is updated and install software-properties-common package.
+Commands:
+sudo apt update && sudo apt upgrade
+sudo apt -y install software-properties-common
+
+STEP2: Import MariaDB gpg key:
+Commands:
+sudo apt-key adv --fetch-keys 'https://mariadb.org/mariadb_release_signing_key.asc'
+
+STEP3: Add MariaDB APT repository:
+Commands:
+sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://archive.mariadb.org/mariadb-10.5.6/repo/ubuntu/ focal main'
+
+STEP4: Install MariaDB Server on 20.04 Linux
+Commands:
+sudo apt update
+sudo apt install mariadb-server mariadb-client
+
+STEP5: Secure MariaDB Server on 20.04 Linux
+Commands:
+sudo mysql_secure_installation (y to all)
+mysql -u root -p 
+
+STEP6: create database inside mysql and import sql file
+Commands:
+mysql> CREATE DATABASE Nginx; // now exit and switch to terminal
+mysql -u root -p Nginx < /path/to/file Filename.sql
+
+
+
+Task2. On an another VM install MariaDB and configure it as the slave of the MariaDB installed in above step.
+
+What was done:
+STEP1: Configure Master Server ( sn )
+Commands:
+i) nano /etc/mysql/mariadb.conf.d/50-server.cnf -> Uncomment line #28 bind address = 0.0.0.0 and enter the system ip.
+# line 73: uncomment and change to any another ID…
+server-id = 101	# line 74: uncomment…log_bin = /var/log/mysql/mysql-bin.log
+ii)systemctl restart mariadb
+iii)mysql -u root -p
+iv)MariaDB [(none)]> grant replication slave on *.* to replica@'%' identified by 'password';
+V)MariaDB [(none)]> flush privileges;
+Vi)show master status ; exit ; note down the bin folder and position
+
+STEP2: Configure Slave Server
+Commands:
+i)
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+# line 28: change to IP of this host
+bind-address            = systemip                      
+
+# line 73: uncomment and change to another ID(different one from Master Host)
+server-id   = different than master id
+
+# line 74: uncomment
+log_bin                 = /var/log/mysql/mysql-bin.log
+
+# line 79: add
+# read only
+read_only=1
+# define own hostname
+report-host= slave
+ii) systemctl restart mariadb
+iii) mysql -u root -p
+iv) stop slave;
+v) CHANGE MASTER TO MASTER_HOST = 'your-master-host-ip', MASTER_USER = 'replica', MASTER_PASSWORD = 'password', MASTER_LOG_FILE = 'mysql-bin.000001', MASTER_LOG_POS = 342;
+(bin folder and position noted down earlier must be here)
+vi)start slave;exit;
+
+Task3. Convert this setup into Master Master replication b/w both the VMs.
+Perform task 2 in a vice versa manner 
+
+Task4. Convert this setup into two nodes Galera clusters and then add another node to this cluster.
+
+STEP1: Configuring the First node 
+Commands:
+i) sudo nano /etc/mysql/mariadb.conf.d/60-galera.cnf
+binlog_format=ROW
+default-storage-engine=innodb
+innodb_autoinc_lock_mode=2
+bind-address=0.0.0.0
+
+# Galera Provider Configuration
+wsrep_on=ON
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+
+# Galera Cluster Configuration
+wsrep_cluster_name="test_cluster"
+wsrep_cluster_address="gcomm://first_ip,second_ip,third_ip"
+
+# Galera Synchronization Configuration
+wsrep_sst_method=rsync
+
+# Galera Node Configuration
+wsrep_node_address="this_node_ip"
+wsrep_node_name="this_node_name"
+
+STEP2: Configuring remaining node
+keep the rest configure same except wsrep_node_address="this_node_ip"
+wsrep_node_name="this_node_name”
+
+STEP3: Starting Cluster:
+Commands:
+
+i)stop “all” MariaDB servers  -
+sudo systemctl stop mysql
+
+ii) bring up the first node 
+sudo galera_new_cluster
+To verify
+mysql -u root -p -e "SHOW STATUS LIKE 'wsrep_cluster_size'"
+
+iii)bring up the second node and third node -
+sudo systemctl start mysql - execute this command in rest of the nodes
+
+5. Take Physical backup from one node to a local or remote location and start a docker on it and compare the checksum of the table.
+https://www.linode.com/docs/guides/create-physical-backups-of-your-mariadb-or-mysql-databases/
+
+5. Upgrade the Galera cluster from 10.5.6 to 10.5.9.                                                     https://mariadb.com/kb/en/upgrading-between-minor-versions-with-galera-cluster/
+
+
+on all the steps above, the checksum for the table should not change, checksum can be checked using `checksum table ngnix_access_log;`
+
+6. Use MariaDB Queries to provide the stats below
+
+a. summary for the day/week/month:
+1. highest requested host                                                                                          ===> select host, count(host) as counts                                                         from ngnix_access_log                                                                        group by host                                                                                           order by counts desc                                                                                                 limit 1                                                                                                                                            
+2. highest requested upstream_ip                                                                               ===> select upstream_ip_port, count(upstream_ip_port) as counts                                                         from ngnix_access_log                                                                        group by host                                                                                                    order by counts desc                                                                                                 limit 1 
+3. highest requested path (upto 2 subdirectories ex: /check/balance)          ===> select path, count(path) as counts                                                         from ngnix_access_log                                                                        group by path                                                                                                    order by counts desc                                                                                                 limit 1 
+
+b. total requests per status code (Ex: count of requests returning 404/401/502/504/500/200)
+===> select statusCode, count(statusCode) 
+          from ngnix_access_log
+          group by statusCode
+
+
+c. Top requests
+1. top 5 requests by upstream_ip ( same as a and b use limit 5)
+2. top 5 requests by host (same as a use limit 5)
+3. top 5 requests by bodyBytesSent                                                                           use Nginx;                                                                                                select bodyBytesSent, count(bodyBytesSent) as counts                    from ngnix_access_log                                                                                         group by bodyBytesSent                                                                                             order by counts desc                                                                                          limit 5 
+4. top 5 requests by path (upto 2 subdirectories ex: /check/balance)                    select path, count(path) as counts                                                         from ngnix_access_log                                                                        group by path                                                                                                    order by counts desc                                                                                                 limit 5
+5. top 5 requests with the highest response time                                                      select responseTime, count(responseTime) as counts                                          from ngnix_access_log                                                                                  group by responseTime                                                                                   order by counts desc                                                                                               limit 5 
+6. get top 5 requests returning 200/5xx/4xx per host
+	===>select host, count(host) as counts
+         from ngnix_access_log
+         where statusCode=200. — can be 5xx or 4xx
+         group by host
+         order by counts desc
+         limit 5 
+
+e. get all request for the last 10 minutes
+f. get all the requests taking more than 2/5/10 secs to respond.
+
+	use Nginx;
+	select *
+	from ngnix_access_log
+	where responseTime > 2  — can be 5 or ten
+	order by responseTime
+
+g. get all the requests in the specified timestamp (Ex: from 06/Mar/2021:04:48 to 06/Mar/2021:04:58)
+
+	SELECT host, COUNT(host)
+	FROM ngnix_access_log 
+	WHERE time BETWEEN 
+	‘07/MAR/2021:00:00:00’ AND ‘07/MAR/2021:23:59:59’
+	GROUP BY host
+	ORDER BY COUNT(host) DESC LIMIT 1
+
+7. Create partitioning on this table using the time values, the table should have weekly partitions.
+8. Truncate the partitions from week 21 to 25;
