@@ -1,1 +1,1 @@
-# Internship tasks in master branch on weekly basis
+# Internship tasks weekly on 'master' branch
