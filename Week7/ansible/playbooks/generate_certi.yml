@@ -1,0 +1,42 @@
+---
+  - name: generate cerificates for ssl securty
+    hosts: elastic
+    become: yes
+    vars:
+      elasticsearch_http_port: 9200
+      elasticsearch_path_home: "/usr/share/elasticsearch"
+      elasticsearch_path_etc: "/etc/elasticsearch"
+      elasticsearch_tls_cert_ca_pass: ""
+      elasticsearch_tls_cert_pass: ""
+      elasticsearch_tls_cert_dir: "certs"
+      elasticsearch_user: "chayank_intern"
+      elasticsearch_user_group: "chayank_intern"
+    tasks:
+      - name: Create a certificate directory
+        file:
+          owner: root
+          group: '{{ elasticsearch_user_group }}'
+          mode: u=rwx,g+rx,o-rwx
+          path: '{{ elasticsearch_path_etc }}/{{ elasticsearch_tls_cert_dir }}'
+          state: directory
+        when: elasticsearch_tls_cert_dir is defined
+      - name: Check a certificate of authority
+        stat:
+          path: "{{ elasticsearch_path_etc }}/{{ elasticsearch_tls_cert_dir }}/elastic-stack-ca.p12"
+        register: elastic_stack_ca_file
+      - name: Generate a certificate of authority
+        args:
+          chdir: '{{ elasticsearch_path_etc }}'
+        become: yes
+        command: "'{{ elasticsearch_path_home }}'/bin/elasticsearch-certutil ca --out '{{ elasticsearch_path_etc }}/{{ elasticsearch_tls_cert_dir }}'/elastic-stack-ca.p12 --pass '{{ elasticsearch_tls_cert_pass }}'"
+        when: not elastic_stack_ca_file.stat.exists
+      - name: Check a certificate and private key for a node
+        stat:
+          path: "{{ elasticsearch_path_etc }}/{{ elasticsearch_tls_cert_dir }}/elastic-certificates.p12"
+        register: elastic_certificates_file
+      - name: Generate a certificate and private key for a node
+        args:
+          chdir: '{{ elasticsearch_path_etc }}'
+        become: yes
+        command: "'{{ elasticsearch_path_home }}'/bin/elasticsearch-certutil cert --ca '{{ elasticsearch_path_etc }}/{{ elasticsearch_tls_cert_dir }}'/elastic-stack-ca.p12 --ca-pass '{{ elasticsearch_tls_cert_pass }}' --out '{{ elasticsearch_path_etc }}/{{ elasticsearch_tls_cert_dir }}'/elastic-certificates.p12 --pass '{{ elasticsearch_tls_cert_ca_pass }}'"
+        when: elastic_stack_ca_file.stat.exists and not elastic_certificates_file.stat.exists

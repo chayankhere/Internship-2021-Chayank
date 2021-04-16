@@ -1,0 +1,63 @@
+---
+- hosts: master
+  become: yes
+  roles:
+    - role: elastic.elasticsearch
+  vars:
+    es_data_dirs: 
+      - "/data/elasticsearch/data"
+    es_log_dir: "/data/elasticsearch/logs"
+    es_heap_size: "256m"
+    es_api_basic_auth_username: "elastic"
+    es_api_basic_auth_password: "changeme"
+    es_enable_auto_ssl_configuration: true
+    es_enable_http_ssl: true
+    es_enable_transport_ssl: true
+    es_ssl_upload: false
+    es_ssl_verification_mode: "certificate"
+    es_ssl_keystore: "/etc/elasticsearch/certs/elastic-stack-ca.p12"
+    es_ssl_keystore_password: ""
+    es_ssl_truststore: "/etc/elasticsearch/certs/elastic-stack-ca.p12"
+    es_ssl_truststore_password: ""
+    es_ssl_certificate_path: "/etc/elasticsearch/certs"
+    es_validate_certs: false
+    es_config:
+      cluster.name: "test"
+      cluster.initial_master_nodes: "172.10.0.1"
+      discovery.seed_hosts: "172.10.0.1,172.10.0.2,172.10.0.6"
+      http.port: 9200
+      node.data: false
+      node.master: true
+      bootstrap.memory_lock: false
+      network.host: "0.0.0.0"
+- hosts: data
+  become: yes
+  roles:
+    - role: elastic.elasticsearch
+  vars:
+    es_data_dirs: 
+      - "/data/elasticsearch/data"
+    es_log_dir: "/data/elasticsearch/logs"
+    es_heap_size: "256m"
+    es_api_basic_auth_username: "elastic"
+    es_api_basic_auth_password: "changeme"
+    es_enable_auto_ssl_configuration: true
+    es_enable_http_ssl: true
+    es_enable_transport_ssl: true
+    es_ssl_upload: false
+    es_ssl_verification_mode: "certificate"
+    es_ssl_keystore: "/etc/elasticsearch/certs/elastic-stack-ca.p12"
+    es_ssl_keystore_password: ""
+    es_ssl_truststore: "/etc/elasticsearch/certs/elastic-stack-ca.p12"      
+    es_ssl_truststore_password: ""
+    es_ssl_certificate_path: "/etc/elasticsearch/certs"
+    es_validate_certs: false
+    es_config:
+      cluster.name: "test"
+      cluster.initial_master_nodes: "172.10.0.1"
+      discovery.seed_hosts: "172.10.0.1,172.10.0.2,172.10.0.6"
+      http.port: 9200
+      node.data: true
+      node.master: false
+      bootstrap.memory_lock: false
+      network.host: "0.0.0.0"
