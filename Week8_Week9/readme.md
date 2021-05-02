@@ -295,4 +295,42 @@ call the same
       (fn [event] (info "expired" event))))))
 ```
 
-now stop restart the riemann-serve to load the change made 
+now stop restart the riemann-serve to load the change made
+
+## Prometheus
+
+### downloading [Prometheus](https://prometheus.io/docs/prometheus/latest/getting_started/) 
+```bash
+tar xvfz prometheus-*.tar.gz
+cd prometheus-*
+./promethues
+```
+### downloading [node exporter](https://prometheus.io/docs/guides/node-exporter/#installing-and-running-the-node-exporter)
+```bash
+wget https://github.com/prometheus/node_exporter/releases/download/v*/node_exporter-*.*-amd64.tar.gz
+tar xvfz node_exporter-*.*-amd64.tar.gz
+cd node_exporter-*.*-amd64
+./node_exporter
+```
+
+### downloading [elasticsearch-exporter](https://github.com/vvanholl/elasticsearch-prometheus-exporter)
+
+```bash
+cd /usr/share/elasticsearch
+sudo bin/elasticsearch-plugin install analysis-phonetic
+./bin/elasticsearch-plugin install -b https://github.com/vvanholl/elasticsearch-prometheus-exporter/releases/download/7.12.0.0/prometheus-exporter-7.12.0.0.zip
+```
+### Configure the Prometheus target
+
+On your Prometheus servers, configure a new job as usual, add a new job in prometheus.yml.
+For example, if you have a cluster of 2 nodes:
+```yml
+- job_name: elasticsearch
+  scrape_interval: 10s
+  metrics_path: "/_prometheus/metrics"
+  static_configs:
+  - targets:
+    - node1:9200
+    - node2:9200
+```
+now restart the prometheus server
