@@ -334,3 +334,7 @@ For example, if you have a cluster of 2 nodes:
     - node2:9200
 ```
 now restart the prometheus server
+
+```bash
+./prometheus --config.file=prometheus.yml
+```
