@@ -97,7 +97,8 @@ PUT index_name
    ```bash
    ip link add veth-pink type veth peer name veth-blue
    ```
-   <img src="https://github.com/Chayank-S/images/blob/main/network%20namespac%204.png" width="500" height="300">
+  <img src="https://github.com/Chayank-S/images/blob/main/network%20namespac%204.png" width="760" height="250">
+   
    - assign each end to the pink and blue namespace
    ```bash
    ip link set veth-pink netns pink
@@ -113,5 +114,6 @@ PUT index_name
    ip -n pink link set veth-pink up
    ip -n blue link set veth-blue up
    ```
-   <img src="https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png" width="500" height="500">
+  <img src="https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png" width="500" height="500">
+   
    - if there are multiple name spaces, to establish connectivity we need to create a virtual switch.
