@@ -113,6 +113,6 @@ PUT index_name
    ip -n pink link set veth-pink up
    ip -n blue link set veth-blue up
    ```
-   ![network3](https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png)
-   ![]<img src="https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png" width="48>
+   ![network5](https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png)
+   <img src="https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png" width="100" height="100">
    - if there are multiple name spaces, to establish connectivity we need to create a virtual switch.
