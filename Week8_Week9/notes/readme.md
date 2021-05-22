@@ -78,5 +78,5 @@ PUT index_name
    - A network namespace allows each of these processes to see an entirely different set of networking interfaces. 
    - Even the loopback interface is different for each network namespac
    - These namespaces have their interfaces isolated from the host.
-   
+   ![network](https://github.com/Chayank-S/images/blob/main/network%20namespace1.png)
    - We can create communiaction between the name spaces using the virtual 
