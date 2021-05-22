@@ -51,8 +51,7 @@ PUT index_name
 		  }
 	}
 }
-```	
-   
+```
    - These replicas are stored in different nodes, and are never stored within the same node as the primary shard
    - This is one of the reason  to have more than one node in a cluster. 
 ![Cluster]( https://www.elastic.co/guide/en/elasticsearch/guide/master/images/elas_0401.png )
@@ -79,4 +78,40 @@ PUT index_name
    - Even the loopback interface is different for each network namespac
    - These namespaces have their interfaces isolated from the host.
    ![network](https://github.com/Chayank-S/images/blob/main/network%20namespace1.png)
-   - We can create communiaction between the name spaces using the virtual 
+   #### We can create new name spaces using 
+   ```bash
+   $ ip netns add pink
+   $ ip netns add blue
+   ```
+   - list the namespace
+   ```bash
+   $ ip netns
+   pink
+   blue
+   ```
+   ![network1](https://github.com/Chayank-S/images/blob/main/network%20namespac%202.png)
+   - The interfaces are isolat from the host
+   ![network2](https://github.com/Chayank-S/images/blob/main/network%20namespac3.png)
+   #### We can create communiaction between the name spaces using the virtual pipe/cabl
+   - create a virtual cable
+   ```bash
+   ip link add veth-pink type veth peer name veth-blue
+   ```
+   ![network3](https://github.com/Chayank-S/images/blob/main/network%20namespac%204.png)
+   - assign each end to the pink and blue namespace
+   ```bash
+   ip link set veth-pink netns pink
+   ip link set veth-blue netns blue
+   ```
+   ![network4](https://github.com/Chayank-S/images/blob/main/network%20namespac%205.png)
+   - assign ip address and bring interface up
+   ```bash
+   ip -n pink addr add <ip.pink> dev veth-pinknetwork namespac4
+   ip -n blue addr add <ip.blue> dev veth-blue
+   
+   # up
+   ip -n pink link set veth-pink up
+   ip -n blue link set veth-blue up
+   ```
+   ![network3](https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png)
+   - if there are multiple name spaces, to establish connectivity we need to create a virtual switch.
