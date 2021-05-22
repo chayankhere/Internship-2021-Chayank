@@ -74,4 +74,9 @@ PUT index_name
    - It is possible to create a nested set of child namespaces: one process starts a child process in a new PID namespace, and that child process spawns yet another process in a new PID namespace, and so on.
    ![pid](https://uploads.toptal.io/blog/image/674/toptal-blog-image-1416487554032.png)
    ## Network namespace
-   - 
+   - in Process namespace, though the process were isolated, they still had full access to the resourse of the host i.e if the child process created above were to listen on port 80, it would prevent every other process from lisening on same port
+   - A network namespace allows each of these processes to see an entirely different set of networking interfaces. 
+   - Even the loopback interface is different for each network namespac
+   - These namespaces have their interfaces isolated from the host.
+   
+   - We can create communiaction between the name spaces using the virtual 
