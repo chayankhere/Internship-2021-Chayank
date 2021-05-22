@@ -61,3 +61,17 @@ PUT index_name
    - Here, to address the sync the model used is *Primary backup* for replication .
    - This means any index operation like adding removing and updation of documents is first done in primary shards and then changes are communicated to the replicas in the replication group.
    ![ Replication in Elasticsearch ]( https://codingexplained.com/wp-content/uploads/7-1024x732.png)
+   
+   # Linux Namespace
+   - But on a server, the services has to be isolated in the view of security and stability.
+   - A server running multiple services unisolated, then if a single service gets compromised, rest of services can be compromised as they are not isolated.
+   ## Process namespace
+   - Linux kernel has maintained a single process tree. The tree contains a reference to every process currently running in a parent-child hierarchy.
+   - Every time a computer with Linux boots up, it starts with just one process, with process identifier (PID) 1. 
+   - This process is the root of the process tree, and it initiates the rest of the system by starting the correct daemons/services. 
+   - All the other processes start below this process in the tree. 
+   - The PID namespace allows one to spin off a new tree, with its own PID 1 process. The process that does this remains in the parent namespace, in the original tree, but makes the child the root of its own process tree
+   - It is possible to create a nested set of child namespaces: one process starts a child process in a new PID namespace, and that child process spawns yet another process in a new PID namespace, and so on.
+   ![pid](https://uploads.toptal.io/blog/image/674/toptal-blog-image-1416487554032.png)
+   ## Network namespace
+   - 
