@@ -114,6 +114,7 @@ PUT index_name
    ip -n pink link set veth-pink up
    ip -n blue link set veth-blue up
    ```
+   - if there are multiple name spaces, to establish connectivity we need to create a virtual switch.
   <img src="https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png" width="500" height="500">
    
-   - if there are multiple name spaces, to establish connectivity we need to create a virtual switch.
+   
