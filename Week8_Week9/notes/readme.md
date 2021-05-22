@@ -106,7 +106,7 @@ PUT index_name
    ![network4](https://github.com/Chayank-S/images/blob/main/network%20namespac%205.png)
    - assign ip address and bring interface up
    ```bash
-   ip -n pink addr add <ip.pink> dev veth-pinknetwork namespac4
+   ip -n pink addr add <ip.pink> dev veth-pink
    ip -n blue addr add <ip.blue> dev veth-blue
    
    # up
@@ -114,4 +114,5 @@ PUT index_name
    ip -n blue link set veth-blue up
    ```
    ![network3](https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png)
+   <img src="https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png" width="48>
    - if there are multiple name spaces, to establish connectivity we need to create a virtual switch.
