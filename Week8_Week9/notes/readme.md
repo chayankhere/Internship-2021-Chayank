@@ -117,4 +117,22 @@ PUT index_name
    - if there are multiple name spaces, to establish connectivity we need to create a virtual switch.
   <img src="https://github.com/Chayank-S/images/blob/main/network%20namespac%206.png" width="500" height="500">
    
-   
+   ## mnt namepsace
+   - Creating separate mount namespace has an effect similar to doing a chroot().
+   - Chroot is does not provide complete isolation, and it isolates at filesystem level only. If ps is excecuted, all the process will be visible.
+   - Creating a separate mount namespace allows each of these isolated processes to have a completely different view of the entire system’s mountpoint structure from the original one.
+  <img src="https://uploads.toptal.io/blog/image/677/toptal-blog-image-1416545619045.png" width="500" height="500">
+  - This allows you to have a different root for each isolated process.
+  - For a particular namespace, it is the root of file system.
+  - We can mount portions of underlying filesystem like adding commands and libraries to the mount namespace.
+  * Use case:
+   > mount namespaces is to create environments that are similar to chroot jails.
+   > But with the use of the chroot() system call only file system level isolation is provided, namespaces provide isolation for process, network interfcaes, process etc.
+
+## Uts namespace
+- it isolates two system identifier *nodename* and *domainname* returned by the uname() systemcall.
+- It is much more convinient to carry the communiaction between hosts using their hostname, than using ip address
+- Searching through log files, for instance, is much easier when identifying a hostname than ip
+- Also, in a dynamic environment, IPs can change which also is the reason to use hostname.
+- The term "UTS" is derived from the name of the structure passed to the uname() system call: struct utsname
+- In the context of containers, the UTS namespaces feature allows each container to have its own hostname and NIS domain name ( NIS =  Network Information Service, or NIS, is a client–server directory service protocol for distributing system configuration data such as user and host names between computers)
