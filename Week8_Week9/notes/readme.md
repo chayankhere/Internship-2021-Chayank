@@ -125,6 +125,7 @@ PUT index_name
   - This allows you to have a different root for each isolated process.
   - For a particular namespace, it is the root of file system.
   - We can mount portions of underlying filesystem like adding commands and libraries to the mount namespace.
+  
   #### Use case:
    - mount namespaces is to create environments that are similar to chroot jails.
    - But with the use of the chroot() system call only file system level isolation is provided, namespaces provide isolation for process, network interfcaes, process etc.
