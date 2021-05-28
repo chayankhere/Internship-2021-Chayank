@@ -137,3 +137,113 @@ PUT index_name
 - Also, in a dynamic environment, IPs can change which also is the reason to use hostname.
 - The term "UTS" is derived from the name of the structure passed to the uname() system call: struct utsname
 - In the context of containers, the UTS namespaces feature allows each container to have its own hostname and NIS domain name ( NIS =  Network Information Service, or NIS, is a client–server directory service protocol for distributing system configuration data such as user and host names between computers)
+
+
+# Docker networking
+
+There are three components in Docker Networking:
+
+-   The Container Network Model (CNM)
+-   Libnetwork
+-   Drivers
+
+**CNM:**  CNM defines and outline fundamental building blocks of Docker Network.
+
+**Libnetwork:**  It is the real implementation of CNM and is used by Docker, Just like TCP/IP is implementation of OSI layer.
+
+**Drivers:**  With the help of drivers, various Network topologies can be implemented like bridge and host based networking.
+
+> Behind the scenes Docker Engine creates the necessary Linux bridges, internal interfaces, iptables rules, and host routes to make this connectivity possible
+
+**CN M**
+CNM is the framework which defines how networking design should be from Docker Network. CNM model is categorised in to three building blocks.
+
+-   Sandboxes
+-   Endpoints
+-   Networks
+
+**Sandbox:**  It is an isolated network stack, which includes Ethernet interface, DNS, Ports, routing tables.
+
+**Endpoints:**  It is a virtual interface, which is used to provide network connection to make communication successful.
+
+**Networks:**  It is the 802.1d software network bridge or software based switch, on which various endpoints connects to communicate to each other.
+
+![enter image description here](https://www.dclessons.com/uploads/2019/09/Docker-7.2.png)
+
+Basic definitions:
+
+-   **NAT:**   Typically, the NAT gives the kernel the ability to provide private networks to connect to the Internet using a single public IP address. 
+-   **Bridge:**  the Network Bridge is a device (can also be a virtual one) that creates a communication surface which connects two or more interfaces to a single flat broadcast network. 
+
+When you run a docker container, 
+- default bridge network is created and all the containers in that host are connected to that particular network bridge.
+- this network bridge acts as a interface to the host, and as bridge to the containers.
+- A respective veth created in order to transfer traffic between the container and the bridge, after a container is created.
+
+![enter image description here](https://argus-sec.com/wp-content/uploads/2020/03/docker6.png)
+
+Host networking
+
+- container’s network stack is not isolated from the Docker host and the container does not get its own IP-address allocated.
+- Eg : if we run a container which binds to port 80 and you use host networking, the container’s application is available on port 80 on the host’s IP address
+1.  Create and start the container as a detached process.
+    
+    ```
+    docker run --rm -d --network host --name my_nginx nginx
+    ```
+2. Verify there are no internal interfcaes were created     
+	  ```
+	  ifconfig
+	 ```
+
+3. -   Verify which process is bound to port 80, using the  `netstat`  command. 
+    
+    ```
+    sudo netstat -tulpn | grep :80
+    ```
+  
+  Bridge Networking
+  
+-   The  **default bridge network**, which allows simple container-to-container communication by IP address, and is created by default.
+    
+-   A  **user-defined bridge network**, which you create yourself, and allows your containers to communicate with each other, by using their container name as a hostname
+
+1. Default Bridge network:
+
+- **Check that the bridge network is running**
+	```
+	docker network ls
+	```
+- **Start container**
+		```
+		docker run -it --network=bridge ubuntu /bin/bash 
+		```
+	  
+- To find the IP addresses of a container, look at the output of the  `docker inspect`  command:
+
+	```
+	$ docker inspect <container_id> | grep IPAddress
+	```
+- Check containers connected to bridge
+	```
+	$ sudo docker inspect bridge
+	```
+
+2. User defined bridge
+Why have a user defined bridge
+- In the default bridge network, all the containers were able to see one another, having a user defined bridge can provide a isolation to certain containers added to that network.
+- **Create a user-defined bridge network**
+	```
+	docker network create mynet
+	```
+- **Start a container and connect it to the bridge**
+	```
+	docker run --rm -it --net mynet --hostname c1 --name ubuntu ubuntu /bin/bash
+	```
+- We can connect or disconnect a container from a network
+	```
+	docker network connect mynet {container_id}
+	```
+	```
+	docker network disconnect mynet {container_id}
+	```
