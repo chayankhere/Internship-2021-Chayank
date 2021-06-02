@@ -249,9 +249,4 @@ Why have a user defined bridge
 	```
 
 
-# Linux Boot process
 
-Following steps
-- 
-
-![](https://static.thegeekstuff.com/wp-content/uploads/2011/02/linux-boot-process.png)
