@@ -284,11 +284,13 @@ Following steps
 	3. USB
 	4. Floppy Disk
 > **How does the BIOS validate if a disk is bootable or not?** :thinking: 
->[reference]( https://superuser.com/questions/420557/mbr-how-does-bios-decide-if-a-drive-is-bootable-or-not#:~:text=The%20BIOS%20decides%20if%20a,at%20the%20446th%20byte)
-	- The BIOS decides if a drive is bootable based on the 16-byte partition record, present _after_ the MBR code area (held in a table starting at the 446th byte). 
-	- The first byte in each partition record represents the drive's bootable status (and is set to `0x80` if bootable, `0x00` if not)
-	- If the flag is set ( the drive is bootable ) then the control is sent back to the start of the MBR code area of the same drive.
-	- if the flag is not set, the BIOS checks the other devices in the given order for a valid bootable disk ( set bootable flag )
+
+[reference]( https://superuser.com/questions/420557/mbr-how-does-bios-decide-if-a-drive-is-bootable-or-not#:~:text=The%20BIOS%20decides%20if%20a,at%20the%20446th%20byte)
+
+- The BIOS decides if a drive is bootable based on the 16-byte partition record, present _after_ the MBR code area (held in a table starting at the 446th byte).
+- The first byte in each partition record represents the drive's bootable status (and is set to `0x80` if bootable, `0x00` if not)
+- If the flag is set ( the drive is bootable ) then the control is sent back to the start of the MBR code area of the same drive.
+- if the flag is not set, the BIOS checks the other devices in the given order for a valid bootable disk ( set bootable flag )
 
 ## 2. MBR
 - Assuming no bootloader is found in the above devices, BIOS is programmed to look at a permanent location on the hard disk to complete its task. 
@@ -317,7 +319,9 @@ Following steps
 - GRUB stages:  
 - GRUB Stage 1  
 - GRUB Stage 1.5  
-- GRUB Stage 2  
+- GRUB Stage 2
+
+![GRUB stages](https://www.linuxnix.com/wp-content/uploads/2013/04/Linux-Booting-process.png) 
 - GRUB displays a splash screen, waits for few seconds, if you don’t enter anything, it loads the default kernel image as specified in the grub configuration file.  
 - GRUB has the knowledge of the filesystem (the older Linux loader LILO didn’t understand filesystem).  
 - Grub configuration file is /boot/grub/grub.conf (/etc/grub.conf is a link to this). The following is sample grub.conf of CentOS.  
