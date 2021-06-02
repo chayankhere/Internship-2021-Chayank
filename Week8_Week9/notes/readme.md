@@ -247,3 +247,11 @@ Why have a user defined bridge
 	```
 	docker network disconnect mynet {container_id}
 	```
+
+
+# Linux Boot process
+
+Following steps
+- 
+
+![](https://static.thegeekstuff.com/wp-content/uploads/2011/02/linux-boot-process.png)
