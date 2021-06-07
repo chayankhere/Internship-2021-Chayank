@@ -428,4 +428,45 @@ If due to some reason Init could not start then, no process will be started and 
 
 Only by users with appropriate privileges can invoke **telinit**.
 
+# inverted index
+
+An inverted index is an index data structure storing a mapping from content, such as words or numbers, to its locations in a document or a set of documents.
+
+Documents are normally stored as lists of words, but inverted indexes invert this by storing for each word the list of documents that the word appears in, hence the name “Inverted index"
+
+There are two types of inverted indexes: 
+- 
+-- A **record-level inverted index** contains a list of references to documents for each word. 
+-- A **word-level inverted index** additionally contains the positions of each word in a document
+
+## Techniques used in Inverted Index
+#### **Lexing** 
+- Lexing refers to the process of converting a document from a list of characters to a list of tokens
+- To generate these tokens from the input character stream,  the input is converted to lowercase. 
+- Then, each collection of alphanumeric characters separated by non-alphanumeric characters (whitespace, punctuation,etc.) is added to the list to each of which is a single alphanumeric word
+
+#### **Stemming** 
+- Stemming means not indexing each word as it appears after lexing, but transforming it to its root (stem) and indexing that instead.
+
+For example, the words “compute”, “computer”, “computation”, “computers”, “computed” and “computing” might all be indexed as “compute"
+
+#### **Stop words**
+- Stop words are words like “a”, “the”, “of”, and “to”, which are so common that nearly every document contains them. 
+- A stop word list contains list of the words to ignore while indexing document
+
+Example of inverted index
+```
+Words                 Document
+ant                   doc1
+demo                  doc2
+world                 doc1, doc2
+```
+
+<img src="https://github.com/Chayank-S/images/blob/main/forwar.png" width="500" height="500">
+<img src="https://github.com/Chayank-S/images/blob/main/inwar.png" width="500" height="500">
+<img src="https://github.com/Chayank-S/images/blob/main/spars.png" width="860" height="860">
+<img src="https://github.com/Chayank-S/images/blob/main/lm1.png" width="860" height="360">
+<img src="https://github.com/Chayank-S/images/blob/main/lm2.png" width="860" height="360">
+<img src="https://github.com/Chayank-S/images/blob/main/lm3.png" width="860" height="360">
+<img src="https://github.com/Chayank-S/images/blob/main/lm4.png" width="860" height="360">
 
