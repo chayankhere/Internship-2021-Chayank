@@ -428,7 +428,7 @@ If due to some reason Init could not start then, no process will be started and 
 
 Only by users with appropriate privileges can invoke **telinit**.
 
-# inverted index
+# inverted index [ research pape ](https://www.researchgate.net/publication/267207321_Inverted_indexes_Types_and_techniques)
 
 An inverted index is an index data structure storing a mapping from content, such as words or numbers, to its locations in a document or a set of documents.
 
