@@ -462,11 +462,11 @@ demo                  doc2
 world                 doc1, doc2
 ```
 
-<img src="https://github.com/Chayank-S/images/blob/main/forwar.png" width="500" height="500">
-<img src="https://github.com/Chayank-S/images/blob/main/inwar.png" width="500" height="500">
-<img src="https://github.com/Chayank-S/images/blob/main/spars.png" width="860" height="860">
-<img src="https://github.com/Chayank-S/images/blob/main/lm1.png" width="860" height="360">
-<img src="https://github.com/Chayank-S/images/blob/main/lm2.png" width="860" height="360">
-<img src="https://github.com/Chayank-S/images/blob/main/lm3.png" width="860" height="360">
-<img src="https://github.com/Chayank-S/images/blob/main/lm4.png" width="860" height="360">
+<img src="https://github.com/Chayank-S/images/blob/main/forwar.png" width="700" height="500">
+<img src="https://github.com/Chayank-S/images/blob/main/inver.png" width="700" height="500">
+<img src="https://github.com/Chayank-S/images/blob/main/spars.png" width="700" height="500">
+<img src="https://github.com/Chayank-S/images/blob/main/lm1.png" width="860" height="260">
+<img src="https://github.com/Chayank-S/images/blob/main/lm2.png" width="860" height="260">
+<img src="https://github.com/Chayank-S/images/blob/main/lm3.png" width="860" height="260">
+<img src="https://github.com/Chayank-S/images/blob/main/lm4.png" width="860" height="260">
 
