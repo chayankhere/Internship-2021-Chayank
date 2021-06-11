@@ -1,10 +1,10 @@
 [http.middlewares.simpleAuth.basicAuth]
   users = [
-    "risheeth:$apr1$PL//SvsQ$duEjj6LEYseVrlNLzDWx0."
+    "admin:$apr1$2AZ0HvFK$RHhCE103dquO6RkKRD2pk0"
   ]
 
 [http.routers.api]
-  rule = "Host(`192.168.1.53`)"
+  rule = "Host(`192.168.1.30`)"
   entrypoints = ["websecure"]
   middlewares = ["simpleAuth"]
   service = "api@internal"
