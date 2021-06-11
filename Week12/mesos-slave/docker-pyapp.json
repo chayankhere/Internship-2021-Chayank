@@ -6,7 +6,7 @@
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "risheethsuryachippada/docker1:latest",
+      "image": "chayankhere/docker-python:1.0",
       "network": "BRIDGE",
       "portMappings": [
         {
@@ -19,6 +19,6 @@
   },
   "labels": {
     "traefik.enable": "true",
-    "traefik.http.routers.router0.rule": "Host(`192.168.1.53:80`)"
+    "traefik.http.routers.router0.rule": "Host(`192.168.1.30:80`)"
   }
 }
