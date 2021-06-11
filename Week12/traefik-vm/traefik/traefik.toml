@@ -10,7 +10,7 @@
 [api]
   dashboard = true
 [certificatesResolvers.lets-encrypt.acme]
-  email = "chayank.intern@phonepe.com"
+  email = "cahaynk.intern@phonepe.com"
   storage = "acme.json"
   [certificatesResolvers.lets-encrypt.acme.tlsChallenge]
 
@@ -22,10 +22,9 @@
   filename = "traefik_secure.toml"
 
 [pilot]
-    token = "1bba1b04-f567-4531-a025-3358404fb3c5"
-
+  token = "ced3126f-f9c5-45e4-ad18-d516082890eb"
 [providers.marathon]
-  endpoint = "http://192.168.1.20:8080"
-  exposedByDefault = true 
+  endpoint = "http://192.168.1.17:8080"
+  exposedByDefault = true
   watch = true
   respectReadinessChecks = true
