@@ -10,7 +10,7 @@
 [api]
   dashboard = true
 [certificatesResolvers.lets-encrypt.acme]
-  email = "cahaynk.intern@phonepe.com"
+  email = "chayank.intern@phonepe.com"
   storage = "acme.json"
   [certificatesResolvers.lets-encrypt.acme.tlsChallenge]
 
