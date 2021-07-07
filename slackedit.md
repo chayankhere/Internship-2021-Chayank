@@ -1,3 +1,181 @@
+# Dropbox  
+> System Design 
+
+**Dropbox** is a file hosting service operated by the American company **Dropbox, Inc.** that offers `cloud storage`, `file synchronization`, `personal cloud`, and `client software`.
+ - Dropbox brings files together in one central place by creating a special folder on the user's computer. The contents of these folders are synchronized to Dropbox's servers and to other computers and devices where the user has installed Dropbox  
+- When a file in a user's Dropbox folder is changed, Dropbox only uploads the [pieces of the file]([https://en.wikipedia.org/wiki/Block_(data_storage)](https://en.wikipedia.org/wiki/Block_(data_storage)) "Block (data storage)") that have been changed, whenever possible.  
+- When a file or folder is deleted, users can recover it within 30 days.  
+- Dropbox accounts that are not accessed or emails not replied in a year are automatically deleted.  
+- Dropbox uses `SSL` transfers for synchronization and stores the data via `Advanced Encryption Standard(AES)-256` encryption.
+## System Design dropbox
+
+### Core / Functional  Features  
+-   User should be able to upload/download, update and delete the files  
+-   File versioning (History of updates)  
+-   File and folder sync
+- System should support offline edit
+### Non functional features
+- Reliability
+- Security
+- usability
+### Traffic  
+-   12+ million unique users  
+-   100 million request per day with lots of reads and write.
+
+### Problem Statement  
+-   **More bandwidth and cloud space utilization:**  To provide a history of the files you need to keep the multiple versions of the files. This requires more bandwidth and more space in the cloud. Even for the small changes in your file, you will have to back up and transfer the whole file into the cloud again and again which is not a good idea.  
+-   **Latency or Concurrency Utilization:**  You can't do time optimization as well. It will consume more time to upload a single file as a whole even if you make small changes in your file. It's also not possible to make use of concurrency to upload/download the files using multi threads or multi processes.
+### Solution   
+- **Break the files into multiple chunks:** There is no need to upload/download the whole single file after making any changes in the file. You just need to save the chunk which is updated (this will take less memory and time). It will be easier to keep the different versions of the files into various chunks.  
+- **Create one more file named as a metadata file:** Incase of multiple files with chunks, This file contains the indexes of the chunks (chunk names and order information). You need to mention the hash of the chunks in this metadata file and you need to sync this file into the cloud.
+ ![](https://media.geeksforgeeks.org/wp-content/cdn-uploads/20200619214958/System-Design-Dropbox-High-Level-Solution.png)
+We can download the metadata file from the cloud whenever we want and we can recreate the file using various chunks.
+### Components for the Dropbox system design  
+![]( https://media.geeksforgeeks.org/wp-content/cdn-uploads/20200619215231/Complete-System-Design-Solution-of-Dropbox-Service.png)
+- Client installed on a computer.  
+- 4 basic components of Client : **`Watcher`,`Chunker`, `Indexer`, and `Internal DB`**  
+- Can consists of multiple clients belongs to the same user.  
+-   The client is responsible for uploading/downloading the files, identifying the file changes in the sync folder, and handling conflicts due to offline or concurrent updates.  
+- The client is actively monitoring the folders for all the updates or changes happening in the files  
+-   To handle file metadata updates (e.g. file name, size, modification date, etc.) this client interacts with the Messaging services and Synchronization Service.  
+-   It also interacts with the remote cloud storage to store the actual files and to provide folder synchronization.
+### APIs
+
+The service will expose API for uploading file and downloading file. 
+
+#### Download Chunk
+
+This API would be used to download the chunk of a file.
+
+Request:
+
+```
+GET /api/v1/chunks/<chunk_id>
+```
+
+#### Upload Chunk
+
+This API would be used to upload the chunk of a file.
+
+Request:
+
+```
+POST /api/v1/chunks/<chunk_id>
+```
+
+Response:
+
+```
+200 OK 
+```
+
+On successful upload, the server will return HTTP response code  `200`. Below are some possible failure response codes:
+
+```
+401 Unauthorized
+400 Bad request
+500 Internal server eror
+```
+### Client Components
+
+-   **Watcher**  
+	- responsible for monitoring the sync folder 
+	- It gives notification to the indexer and chunker if any action is performed in the files or folders.
+-   **Chunker**  
+	-  For new file
+		- Break the files into multiple small  chunks  
+		- upload it to the cloud storage with a unique id or hash of chunks. 
+	-	For any changes in the files, 
+		-	the chunking algorithm detects the specific chunk which is modified
+		-	only saves that specific part/chunks to the cloud storage. 
+-   **Indexer**   
+	- responsible for updating the internal database when it receives the notification from the watcher  
+	- receives the URL of the chunks from the chunker along with the hash and updates the file with modified chunks. 
+	- Indexer communicates with the Synchronization Service using the Message Queuing Service.
+-   **Internal database**  
+	- store all the files and chunks information, their versions, and their location in the file system.
+
+### Discuss The Other Components
+
+#### 1. Metadata Database
+
+- The metadata database maintains the indexes of the various chunks. 
+- The information contains files/chunks names, their different versions along with the information of users and workspace.
+
+- Relational databases ( use for consistency ) are difficult to scale so if we are using the MySQL database then you need to use a database sharding technique to scale the application. 
+- we need to build an edge wrapper around the sharded databases to scale.
+	- This edge wrapper provides the ORM and the client can easily use this edge wrapper’s ORM to interact with the database (instead of interacting with the databases directly).
+
+![System-Design-Dropbox-Metadata-Edge-Wrapper]( https://media.geeksforgeeks.org/wp-content/cdn-uploads/20200619220100/System-Design-Dropbox-Metadata-Edge-Wrapper.png)
+
+#### 2. Message Queuing Service
+
+The messaging service queue will be responsible for the asynchronous communication between the clients and the synchronization service.
+
+![System-Design-Dropbox-Message-Queue-Service]( https://media.geeksforgeeks.org/wp-content/cdn-uploads/20200619220312/System-Design-Dropbox-Message-Queue-Service.png)
+
+Below are the main requirements of the Message Queuing Service.
+
+-   Ability to handle lots of reads and writes requests.
+-   Store lots of messages in a highly available and reliable queue.
+-   High performance and high scalability.
+
+There will be two types of messaging queues in the service.
+
+-   **Request Queue:**  
+-   **Response Queue:**  
+ 
+>The message will never be lost even if the client will be disconnected from the internet (the benefit of using the messaging queue service).
+    
+    
+    
+
+#### 3. Synchronization Service
+
+The client communicates with the synchronization services either to receive the latest update from the cloud storage or to send the latest request/updates to the Cloud Storage to clients.
+
+- receives the request from the request queue of the messaging services and updates the metadata database with the latest changes. 
+-  broadcast the latest update to the other clients  through the response queue so that the other client’s indexer can fetch back the chunks from the cloud storage and recreate the files with the latest update.  
+- updates the local database with the information stored in the Metadata Database. 
+
+#### 4. Cloud Storage
+
+- The client communicates with the cloud storage for any action performed in the files/folders using the API provided by the cloud provider.
+
+
+
+
+# Root Cause Analysi (RCA)
+## **What is** **Root Cause Analysis (RCA)?**
+
+- Approach used to analyze serious problems before trying to solve them 
+- RCA helps isolates and identifies the main root cause of a problem . 
+
+**Root cause analysis (****RCA****)**  
+- Is effective problem solving method.
+
+- RCA could be done using multiple tools and methods.
+
+ - Root cause analysis is a reactive approach.
+
+- Root cause analysis is a team approach methodology.
+
+- RCA should be applied shortly after adverse events to keep track of all essential details. 
+
+## **Root Cause Analysis (RCA) Tools**
+
+Root cause analysis (RCA) could be applied using a wide variety of tools, there is no perfect method that can be used anywhere, instead, the quality managers would select the suitable approach for organization and team members, typically using brainstorming technique.
+
+-   Fishbone diagram, also known as Ishikawa or cause and effect diagram is one of the classic tools for RCA. 
+-   Five whys is another popular tool for RCA, also known as Gemba Gembustu. 
+-   A flowchart is mapping the process steps through different sections or departments that could be helpful to identify defects source location.
+-   Pareto chart is usually performed during brainstorming sessions to prioritize the given possible cause of the adverse event. 
+-   Scatter diagram is another displaying tool that facilitates localizing relations by representing numerical variables on graphs.
+
+
+ 
+
+
 # Consistant Hashing
 
 - One of the ways hashing can be implemented in a distributed system is by taking hash Modulo of a number of nodes.  
@@ -983,5 +1161,7 @@ For example, if you have a cluster of 2 nodes:
     - node2:9200
 ```
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE1OTA5MzEzMDRdfQ==
+eyJoaXN0b3J5IjpbMjA4MzI1MzM5LC00MDQyMDE1NjAsMTU0Nz
+Q2NTI1OCwyMzgwOTMyOTUsMTgyODAxMDAyMCwtMTM0NjEyNTg5
+LC0xNTkwOTMxMzA0XX0=
 -->
